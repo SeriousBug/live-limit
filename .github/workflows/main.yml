@@ -1,10 +1,13 @@
 name: CI
 
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   lint-test-build-publish:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -12,7 +15,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: lts/gallium
           registry-url: 'https://registry.npmjs.org'
           scope: '@codexteam'
 
@@ -46,23 +49,3 @@ jobs:
         run: yarn publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-  notify:
-    needs: lint-test-build-publish
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Get package info
-        id: package
-        uses: codex-team/action-nodejs-package-info@v1
-
-      - name: Send a message
-        uses: codex-team/action-codexbot-notify@v1
-        with:
-          webhook: ${{ secrets.CODEX_BOT_WEBHOOK }}
-          message: '📦 [${{ steps.package.outputs.name }}](${{ steps.package.outputs.npmjs-link }}) ${{ steps.package.outputs.version }} was published'
-          parse_mode: 'markdown'
-          disable_web_page_preview: true
