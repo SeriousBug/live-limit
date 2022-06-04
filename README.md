@@ -1,29 +1,64 @@
-# typescript-lib-template
-A quick start template for a new TypeScript library
+# Live Limit
 
-[![NPM version](https://img.shields.io/npm/v/@codexteam/typescript-lib-template?style=flat-square)](https://www.npmjs.com/package/@codexteam/typescript-lib-template)
-[![License](https://img.shields.io/npm/l/@codexteam/typescript-lib-template?style=flat-square)](https://www.npmjs.com/package/@codexteam/typescript-lib-template)
+Need to limit the number of concurrent requests to a server? Or make sure only one function call is running at a time?
+Live Limit to the rescue!
 
-## How to use
-1. Click [here](https://github.com/codex-team/typescript-lib-template/generate) and fill setting for new repository
-2. Change package name in `package.json` and other fields if necessary
-3. Change NPM package scope from [workflow file](./.github/workflows/main.yml) or remove it
-4. Fill `NPM_TOKEN` and `CODEX_BOT_WEBHOOK` secrets in your repository or organization settings
-5. Start writing your new library!
+## Example
 
-## Features
+```ts
+// Setup
+const LIMITER = new LiveLimit({ maxLive: 3 });
+async function myFunc(n: number) {
+    // ... use n here ...
+}
 
-- TypeScript support
-- ESlint support with [eslint-config-codex](http://github.com/codex-team/eslint-config/)
-- Unit testing with [Jest](http://jestjs.io)
-- GitHub Actions configuration for test/lint/build/publish purposes
+// Usage
+const param = 1;
+LIMITER.limit(async () => {
+    await myFunc(param);
+});
+// Usage when you have many calls to make at once
+const params = [1, 2, 3, 4, 5, 6];
+params.forEach((param) => {
+    LIMITER.limit(async () => {
+        myFunc(param);
+    });
+});
+```
 
-## About team
+### Example with Axios, React, and Redux
 
-We are CodeX and we build products for developers and makers.
+```ts
+const LIMITER = new LiveLimit({ maxLive: 3 });
 
-Follow us on Twitter: [twitter.com/codex_team](https://twitter.com/codex_team)
+function SendButton() {
+  const dataToSend: any[] = selector((state) => state.data.to.send);
+  const [state, setState] = useState<"done" | "loading" | undefined>();
 
-Feel free to contact: <a href="mailto:team@codex.so?subject=Editor.js feedback">team@codex.so</a>
-
-[codex.so](https://codex.so)
+  return (<Button
+    // Disable button while loading or done
+    disabled={state !== undefined}
+    // When clicked, make all the requests
+    onClick={() => {
+      // Disable the button
+      setState("loading");
+      // Wait until it's done to mark as done
+      Promise.all(
+        dataToSend.map(
+          // Creating a promise for each request we need to do
+          async (data) => {
+            // Every request goes through the limiter
+            await LIMITER.limit(async () => {
+              await axios.post("/url/to/send/to", data);
+            });
+          }
+        )
+      ).then(() => {
+        setState("done");
+      });
+    }}
+  >
+    Send all the data
+  </Button>);
+}
+```
