@@ -1,0 +1,68 @@
+name: CI
+
+on: push
+
+jobs:
+  lint-test-build-publish:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          registry-url: 'https://registry.npmjs.org'
+          scope: '@codexteam'
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Restore Yarn cache
+        uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependecies
+        run: yarn install
+
+      - name: Test Eslint
+        run: yarn lint:test
+
+      - name: Run unit tests
+        run: yarn test
+
+      - name: Build library
+        run: yarn build
+
+      - name: Publish library
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: yarn publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  notify:
+    needs: lint-test-build-publish
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get package info
+        id: package
+        uses: codex-team/action-nodejs-package-info@v1
+
+      - name: Send a message
+        uses: codex-team/action-codexbot-notify@v1
+        with:
+          webhook: ${{ secrets.CODEX_BOT_WEBHOOK }}
+          message: '📦 [${{ steps.package.outputs.name }}](${{ steps.package.outputs.npmjs-link }}) ${{ steps.package.outputs.version }} was published'
+          parse_mode: 'markdown'
+          disable_web_page_preview: true
