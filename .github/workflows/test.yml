@@ -1,8 +1,9 @@
-name: CI
+name: release
 
 on:
   push:
-    branches:
+    branches-ignore:
+      # release action already tests the main branch
       - main
 
 jobs:
@@ -43,9 +44,3 @@ jobs:
 
       - name: Build library
         run: yarn build
-
-      - name: Publish library
-        if: ${{ github.ref == 'refs/heads/main' }}
-        run: yarn publish --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
