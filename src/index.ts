@@ -92,6 +92,11 @@ export class LiveLimit {
   public async limit(fn: () => Promise<unknown>): Promise<void> {
     const key = this.lastId;
 
+    // Increment the ID, so the next executed function will get a different
+    // integer ID. We simulate an integer overflow to wrap around once we have
+    // used up all the IDs. This means how many calls can be queued up at a time
+    // is limited, but that limit is high enough that nobody can probably hit it
+    // without breaking the JavaScript engine.
     if (this.lastId + 1 < Number.MAX_SAFE_INTEGER) {
       this.lastId = this.lastId + 1;
     } else {
@@ -109,7 +114,13 @@ export class LiveLimit {
     // multiple "threads" may wake up at the same time, in which case some may
     // need to go back to waiting.
     while (this.inProgress.size >= this.config.maxLive) {
-      await Promise.any(this.inProgress.values());
+      try {
+        await Promise.race(this.inProgress.values());
+      } catch {
+        // Ignore whether the promise resolved or rejected, because this is just
+        // to pause until a promise is done. We actually check the result when
+        // executing the function.
+      }
     }
 
     try {
