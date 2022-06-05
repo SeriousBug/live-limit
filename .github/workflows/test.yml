@@ -40,7 +40,7 @@ jobs:
         run: yarn lint:test
 
       - name: Run unit tests
-        run: yarn test --coverage && codecov
+        run: yarn test --coverage && yarn codecov
 
       - name: Build library
         run: yarn build
