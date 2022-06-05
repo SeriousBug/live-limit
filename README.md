@@ -1,6 +1,6 @@
 # Live Limit
 
-![npm](https://img.shields.io/npm/v/live-limit) ![npm bundle size](https://img.shields.io/bundlephobia/minzip/live-limit) ![coverage badge](https://img.shields.io/codecov/c/github/SeriousBug/live-limit) ![tests badge](https://img.shields.io/github/workflow/status/SeriousBug/live-limit/test?label=tests) ![0 dependencies](https://img.shields.io/badge/dependencies-0-success)
+[![npm](https://img.shields.io/npm/v/live-limit)](https://www.npmjs.com/package/live-limit) [![npm bundle size](https://img.shields.io/bundlephobia/minzip/live-limit)](https://bundlephobia.com/package/live-limit@1.0.0) [![coverage badge](https://img.shields.io/codecov/c/github/SeriousBug/live-limit)](https://app.codecov.io/gh/SeriousBug/live-limit) [![tests badge](https://img.shields.io/github/workflow/status/SeriousBug/live-limit/test?label=tests)](https://github.com/SeriousBug/live-limit/actions/workflows/test.yml) [![0 dependencies](https://img.shields.io/badge/dependencies-0-success)](https://www.npmjs.com/package/live-limit) [![MIT license](https://img.shields.io/npm/l/live-limit)](https://github.com/SeriousBug/live-limit/blob/main/LICENSE)
 
 Need to limit the number of concurrent requests to a server? Or make sure only one function call is running at a time?
 Live Limit to the rescue!
