@@ -3,8 +3,6 @@ name: test
 on:
   push:
     branches-ignore:
-      # release action already tests the main branch
-      - main
       # Docs only contains the docs that have been built by the bot
       - docs
 
@@ -42,7 +40,7 @@ jobs:
         run: yarn lint:test
 
       - name: Run unit tests
-        run: yarn test
+        run: yarn test --coverage && codecov
 
       - name: Build library
         run: yarn build
