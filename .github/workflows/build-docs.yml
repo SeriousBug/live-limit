@@ -39,9 +39,4 @@ jobs:
         run: yarn typedoc
 
       - name: Push docs
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Rebuild docs
-          branch: docs
-          create_branch: true
-          file_pattern: docs
+        run: git add docs/ && git commit -m "Rebuild docs" && git push origin docs
