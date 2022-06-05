@@ -1,4 +1,4 @@
-/** The behavior to follow when the {@link LiveLimitConfig.maxLive} limit is hit. */
+/** The behavior to follow when the {@link LiveLimitConfig maxLive} limit is hit. */
 export enum MaxReachedBehavior {
   /** Additional calls are queued, and will be executed when spots become available. */
   Queue = "Queue",
@@ -8,28 +8,26 @@ export enum MaxReachedBehavior {
 
 /** The configuration used to set up the live limiter. */
 export type LiveLimitConfig = {
-  // The maximum number of calls that can be live at the same time.
-  //
-  // Once this number is reached, additional calls are queued or dropped based on the {@link LiveLimitConfig.maxReached} setting.
-  //
+  /** The maximum number of calls that can be live at the same time.
+   *
+   * Once this number is reached, additional calls are queued or dropped based on the `maxReached` setting.
+   */
   maxLive: number;
-  // How to handle additional calls once {@link LiveLimitConfig.maxLive} is reached.
-  //
-  // This is {@link MaxReachedBehavior.Queue} by default, meaning that additional calls are queued and will wait to execute.
-  //
+  /** How to handle additional calls once `maxLive` is reached.
+   *
+   * This is {@link MaxReachedBehavior.Queue Queue} by default, meaning that additional calls are queued and will wait to execute.
+   */
   maxReached?: MaxReachedBehavior;
 };
 
-// The limiter.
-//
-// You likely want to create your limiter as a global to ensure that all
-// operations will share the same limiter and will respect the limit.
-//
-// Limitations: You can only queue up to $2^(54) - 1$ many calls at a time (over
-// 18 quadrillion). Additional calls may cause some queued calls to be dropped.
-//
-/**
+/** The limiter.
  *
+ * You likely want to create your limiter as a global to ensure that all
+ * operations will share the same limiter and will respect the limit.
+ *
+ * Limitations: You can only queue up to 2^54 - 1 many calls at a time (over
+ * 18 quadrillion). Additional calls may cause some queued calls to be dropped.
+ * Although nodejs will probably break before you get to that number.
  */
 export class LiveLimit {
   private config: Required<LiveLimitConfig>;
@@ -61,12 +59,13 @@ export class LiveLimit {
    * The returned promise is resolved:
    * - When the function is executed and the promise returned by the function
    *    resolves
-   * - If {@link LiveLimitConfig.maxReached} is {@link MaxReachedBehavior.Drop},
+   * - If {@link LiveLimitConfig maxReached} is {@link MaxReachedBehavior.Drop Drop},
    *    when the function call is dropped.
    *
    * Accepts no arguments, you should use closures to pass parameters to the
-   * function. For example:
+   * function.
    *
+   * @example
    * ```ts
    * // Setup
    * const LIMITER = new LiveLimit({ maxLive: 3 });
@@ -99,7 +98,10 @@ export class LiveLimit {
       this.lastId = Number.MIN_SAFE_INTEGER;
     }
 
-    if (this.inProgress.size >= this.config.maxLive && this.config.maxReached === MaxReachedBehavior.Drop) {
+    if (
+      this.inProgress.size >= this.config.maxLive &&
+      this.config.maxReached === MaxReachedBehavior.Drop
+    ) {
       return;
     }
 
