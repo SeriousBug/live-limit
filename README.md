@@ -3,6 +3,19 @@
 Need to limit the number of concurrent requests to a server? Or make sure only one function call is running at a time?
 Live Limit to the rescue!
 
+## Docs
+
+See the [Live Limit Docs](https://seriousbug.github.io/live-limit/) for details.
+
+## Install
+
+```sh
+# with npm
+npm install --save live-limit
+# with yarn
+yarn add live-limit
+```
+
 ## Example
 
 ```ts
