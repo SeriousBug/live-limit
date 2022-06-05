@@ -39,4 +39,4 @@ jobs:
         run: yarn typedoc
 
       - name: Push docs
-        run: git add docs/ && git commit -m "Rebuild docs" --author "Actions Bot <1008124+SeriousBug@users.noreply.github.com>" && git push origin docs
+        run: git config user.email "1008124+SeriousBug@users.noreply.github.com" && git config user.name "Actions Bot" && git add docs/ && git commit -m "Rebuild docs" && git push origin docs
