@@ -1,9 +1,6 @@
 name: release
 
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 jobs:
   lint-test-build-publish:
