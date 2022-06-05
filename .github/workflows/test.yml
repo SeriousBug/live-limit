@@ -9,7 +9,7 @@ on:
       - docs
 
 jobs:
-  lint-test-build-publish:
+  lint-test-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
