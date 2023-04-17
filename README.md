@@ -50,6 +50,13 @@ params.forEach((param) => {
         myFunc(param);
     });
 });
+
+// The async calls can also return a result.
+// The promise returned by `LIMITER.limit` will be the result that your function returned.
+const out = await LIMITER.limit(async () => {
+    return 'foo';
+});
+console.log(out); // prints 'foo'
 ```
 
 ### Example with Axios, React, and Redux

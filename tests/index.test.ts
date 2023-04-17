@@ -26,6 +26,17 @@ describe("WHEN there's a single call", () => {
     });
   });
 
+  describe("AND that call returns something", () => {
+    test("Returns the value once that function call is done", async () => {
+      const limiter = new LiveLimit({ maxLive: 3 });
+
+      const result = await limiter.limit(async () => {
+        return "result";
+      });
+      expect(result).toEqual("result");
+    });
+  });
+
   describe("AND that call rejects", () => {
     test("Rejects once that function call is done", async () => {
       const limiter = new LiveLimit({ maxLive: 3 });
@@ -116,6 +127,23 @@ describe("WHEN there are more calls than the limit", () => {
           })
         );
         expect(calls).toBeLessThan(5);
+      });
+
+      test("Dropped calls return null", async () => {
+        const limiter = new LiveLimit({
+          maxLive: 2,
+          maxReached: MaxReachedBehavior.Drop,
+        });
+
+        const returned = await Promise.all(
+          [1, 2, 3, 4, 5].map(() => {
+            return limiter.limit(async () => {
+              await sleep(100);
+              return "yes!";
+            });
+          })
+        );
+        expect(returned).toEqual(expect.arrayContaining([null, "yes!"]));
       });
     });
   });
