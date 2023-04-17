@@ -14,6 +14,8 @@ jobs:
         with:
           node-version: lts/hydrogen
           cache: yarn
+          registry-url: https://registry.npmjs.org
+          always-auth: true
 
       - name: Install dependecies
         run: yarn install
