@@ -88,8 +88,9 @@ export class LiveLimit {
    * ```
    *
    * @param fn The function to execute.
+   * @returns The resolved promise returned by the function, or `null` if the call was dropped.
    */
-  public async limit(fn: () => Promise<unknown>): Promise<void> {
+  public async limit<T>(fn: () => Promise<T>): Promise<T | null> {
     const key = this.lastId;
 
     // Increment the ID, so the next executed function will get a different
@@ -107,7 +108,7 @@ export class LiveLimit {
       this.inProgress.size >= this.config.maxLive &&
       this.config.maxReached === MaxReachedBehavior.Drop
     ) {
-      return;
+      return null;
     }
 
     // Wait until a slot is available for this call. This is in a loop because
@@ -127,7 +128,8 @@ export class LiveLimit {
       const promise = fn();
 
       this.inProgress.set(key, promise);
-      await promise;
+      const out = await promise;
+      return out;
     } finally {
       this.inProgress.delete(key);
     }

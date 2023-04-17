@@ -1,6 +1,6 @@
 {
   "name": "live-limit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A promise based generic rate limiter. Runs a limited number of async function calls at a time, queuing or discarding remaining calls.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
